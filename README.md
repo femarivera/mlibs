@@ -2,16 +2,17 @@
   <img src="assets/logo_confinedlab.png" height="100">
 </p>
 
-# ConfinedLab-mlibs
+# Groundwater modelling library - mlibs
 
-**MODFLOW 6 modelling utilities for synthetic multilayer groundwater systems.**
+**MODFLOW 6 and PESTPP modelling utilities.**
 
-> 📦 This package is the utility library for the [ConfinedLab](https://github.com/femarivera/ConfinedLab) project.
+> 📦 This package is used as a utility library for the [ConfinedLab](https://github.com/femarivera/ConfinedLab) project.
+
 ---
 
 ## What is this?
 
-`mlibs` is a Python package providing utilities to facilitate building and analyzing **MODFLOW 6** groundwater models. It is designed around multilayer groundwater systems, assisting in workflows from geometry generation to transient results analysis.
+`mlibs` is a Python package providing utilities to facilitate building and analysing **MODFLOW 6** groundwater models and their calibration using **PEST++** (via pyemu).
 
 ---
 
@@ -20,8 +21,8 @@
 | Module | Description |
 |---|---|
 | `modgeom6` | Generate structured grids from defined geometries: idomain arrays, top/bottom elevations, thickness, recharge, layer subdivision |
-| `modbound6` | Create boundary condition stress period data: rivers (RIV), general head (GHB), drains (DRN) |
-| `modpar6` | Generate spatially correlated random fields of hydraulic parameters (K, Sy, Ss) using FFT-based simulation |
+| `modbound6` | Create boundary condition stress period data (RIV, GHB, DRN), select active cells by layer/zone/range, export the grid to shapefile, compute vertical head differences |
+| `modpar6` | Generate spatially correlated random fields of hydraulic parameters (K, Sy, Ss) using FFT-based simulation, and set up PEST++ parameterisation files (templates, instruction files) with pyemu |
 | `modplot6` | Visualise model grids, heads, cross-sections, boundary conditions, and budget summaries |
 | `modpump6` | Analyse pumping scenarios: estimate capture rates and water budgets, estimate sustainable yields from constraints and planning horizons |
 | `modtransient6` | Process and visualise transient results: time-series heads, flows, storage release, zone budgets |
@@ -33,30 +34,24 @@
 ### Requirements
 
 - Python >= 3.9
-- numpy >= 1.26
-- scipy >= 1.12
-- matplotlib >= 3.9
-- flopy >= 3.8
-- pandas >= 2.0
-- geopandas >= 1.0
-- shapely
-- imageio >= 2.36
-- scikit-learn >= 1.6
+- Python dependencies are listed in [`pyproject.toml`](pyproject.toml) and installed automatically by pip.
+- [git](https://git-scm.com/), to install from GitHub
+- [MODFLOW 6](https://github.com/MODFLOW-ORG/modflow6) available on your `PATH`.
 
-### Local install (recommended for development)
+### Install a released version (recommended)
+
+```bash
+pip install git+https://github.com/femarivera/mlibs.git@vx.x.x
+```
+
+### Local install (for development)
 
 Clone the repository and install in editable mode. Any changes you make to the files are immediately available — no reinstall needed.
 
 ```bash
-git clone https://github.com/femarivera/ConfinedLab-mlibs.git
-cd ConfinedLab-mlibs
+git clone https://github.com/femarivera/mlibs.git
+cd mlibs
 pip install -e .
-```
-
-### Install directly from GitHub
-
-```bash
-pip install git+https://github.com/femarivera/ConfinedLab-mlibs.git
 ```
 
 ---
@@ -95,8 +90,9 @@ idomain = modgeom6.idomain_from_thickness(thickness_array, epsilon)
 # --- flopy simulation building section --- #
 
 modplot6.plot_cross_section_array(
-    gwf, zone_array, nrow // 2,
-    figsize=(19, 5), fontsize=14, label="Model layers"
+    gwf, row=nrow // 2, output_path="cross_section.png",
+    array=idomain, figsize=(19, 5), fontsize=14,
+    label="Model layers", show=True
 )
 ```
 ![Example geometry output](assets/example_output_geometry.png)
@@ -135,6 +131,8 @@ Functions to build the 3D grid structure of a synthetic multilayer system.
 ### `modpar6` — Parameter fields
 
 Generate spatially correlated random fields from prior knowledge of hydraulic properties.
+Set up PEST++ files (templates, instruction files) with pyemu.
+Facilitates model parameterisation from ensemble files, pestpp update files, and custom data frames.
 
 ### `modbound6` — Boundary conditions
 
@@ -146,7 +144,7 @@ Visualise model structure, results, and budget components for steady-state and t
 
 ### `modpump6` — Pumping analysis
 
-Automate pumping rate iteration and analyse capture distribution accross budget components.
+Automate pumping rate iteration and analyse capture distribution across budget components.
 Estimate sustainable yields or maximum abstraction volumes for a given pumping scenario using transient models.
 
 ### `modtransient6` — Transient analysis
@@ -159,7 +157,7 @@ Estimate response times to imposed stresses or changes in boundary conditions.
 ## Repository structure
 
 ```
-ConfinedLab-mlibs/         <- repository root
+mlibs/                     <- repository root
 ├── mlibs/                 <- installable package
 │   ├── __init__.py
 │   ├── modgeom6.py
@@ -168,6 +166,7 @@ ConfinedLab-mlibs/         <- repository root
 │   ├── modplot6.py
 │   ├── modpump6.py
 │   └── modtransient6.py
+├── assets/                <- logos and README figures
 ├── pyproject.toml
 ├── LICENSE
 └── README.md
