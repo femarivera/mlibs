@@ -21,6 +21,7 @@
 #  - Utilities for extracting active cell indices from irch/idomain arrays, with options for subsetting and sampling.
 
 import numpy as np
+import os
 import pandas as pd
 import itertools
 import geopandas as gpd
@@ -729,6 +730,28 @@ def next_active_layer(idomain, lay, row, col, flay=None, force_glay=False):
             return l
     return -1  # no active layer found within the search range
 
+def head_layer(idomain, lay, row, col, h, zbot, nsub, max_glay_shift=1):
+    """
+    Head check for head observations at their original sublayer `lay`. If the head `h` is
+    lower than the bottom of the geological layer containing `lay`, the observation is placed
+    in the sublayer whose elevation range contains `h`. Returns -1 (observation to be dropped)
+    if `h` is below the model bottom, if the sublayer containing `h` lies more than
+    `max_glay_shift` geological layers below the original one, or if the resulting cell is
+    inactive.
+    `zbot` is the (subdivided) cell bottom array, `nsub` the number of sublayers per
+    geological layer.
+    """
+    glay_ends = np.cumsum(nsub)  # exclusive end sublayer of each geological layer
+    glay = np.searchsorted(glay_ends, lay, side='right')
+    if not pd.isna(h) and h < zbot[glay_ends[glay] - 1, row, col]:
+        below = np.flatnonzero(zbot[:, row, col] <= h)
+        lay = below[0] if below.size else -1
+        if lay != -1 and np.searchsorted(glay_ends, lay, side='right') - glay > max_glay_shift:
+            lay = -1
+    if lay == -1 or idomain[lay, row, col] != 1:
+        return -1
+    return lay
+
 def assign_nearest_layer(row, zcenters, z_col):
     """
     Nearest sublayer to row[z_col], within [row.mlay, row.flay], clipped at the ends.
@@ -741,15 +764,43 @@ def assign_nearest_layer(row, zcenters, z_col):
     z = row[z_col]
     if pd.isna(z):
         lay = row['clay']
-        return zcenters[lay, r, c], lay
+        return zcenters[lay, r, c], int(lay)
     mlay, flay = row['mlay'], row['flay']
     z_mlay = zcenters[mlay, r, c]
     z_flay = zcenters[flay, r, c]
     if z > z_mlay:
-        return z_mlay, mlay
+        return z_mlay, int(mlay)
     elif z < z_flay:
-        return z_flay, flay
+        return z_flay, int(flay)
     lay_range = np.arange(mlay, flay + 1)
     z_layers = zcenters[lay_range, r, c]
     nearest_lay = lay_range[np.argmin(np.abs(z_layers - z))]
-    return z, nearest_lay
+    return z, int(nearest_lay)
+
+def zonebud_pest_df(gwf, zone_array, output_folder, name):
+    """
+    Run ZoneBudget on gwf's saved CBB output, keep only the last time step
+    (steady state has one; transient keeps only its last saved step), and
+    return every budget term as a PEST-ready DataFrame with columns 'name'
+    (zb_z##_<term>, term being the column name lowercased/slugified) and
+    'value'. Used identically by pest_setup.py and model_pest_ss.py/
+    model_pest_tr.py so the observation names always match.
+    """
+    zb = gwf.output.zonebudget(zone_array)
+    zb.name = name
+    zb.change_model_ws(output_folder)
+    zb.write_input()
+    zb.run_model(silent=True)
+
+    zb_df = pd.read_csv(os.path.join(output_folder, f"{name}.csv"))
+    last = zb_df.loc[zb_df.totim == zb_df.totim.max()].set_index("zone")
+    term_cols = [c for c in last.columns if c not in ("totim", "kstp", "kper")]
+
+    names, values = [], []
+    for zone, row in last.iterrows():
+        for c in term_cols:
+            slug = c.lower().replace(" ", "_").replace("-", "_")
+            names.append(f"zb_z{int(zone):02d}_{slug}")
+            values.append(row[c])
+
+    return pd.DataFrame({"name": names, "value": values})

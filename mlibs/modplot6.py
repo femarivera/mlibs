@@ -534,7 +534,7 @@ def plot_cross_section_row(gwf,
     if interfaces is not None:
         try:
             dcol = gwf.modelgrid.delr if np.isscalar(gwf.modelgrid.delr) else np.mean(gwf.modelgrid.delr)
-            x = np.arange(ncol) * dcol
+            x = (np.arange(ncol) + 0.5) * dcol
 
             # Plot each interface
             for k in range(interfaces.shape[0]):
@@ -749,12 +749,12 @@ def plot_cross_section_col(gwf,
 
     if interfaces is not None:
         try:
-            drow = gwf.modelgrid.delr if np.isscalar(gwf.modelgrid.delr) else np.mean(gwf.modelgrid.delr)
-            x = np.arange(nrow) * drow
+            drow = gwf.modelgrid.delc if np.isscalar(gwf.modelgrid.delc) else np.mean(gwf.modelgrid.delc)
+            x = (np.arange(nrow) + 0.5) * drow
 
             # Plot each interface
             for k in range(interfaces.shape[0]):
-                ax.plot(x, interfaces[k, col, :], "k-", lw=1.0)
+                ax.plot(x, interfaces[k, :, col], "k-", lw=1.0)
 
         except Exception as e:
             print(f"Could not plot interfaces: {e}")
@@ -912,7 +912,7 @@ def plot_cross_section_array(gwf,
     if interfaces is not None:
         try:
             dcol = gwf.modelgrid.delr if np.isscalar(gwf.modelgrid.delr) else np.mean(gwf.modelgrid.delr)
-            x = np.arange(ncol) * dcol
+            x = (np.arange(ncol) + 0.5) * dcol
 
             # Plot each interface
             for k in range(interfaces.shape[0]):

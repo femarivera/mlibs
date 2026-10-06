@@ -520,7 +520,7 @@ def compute_irch(idomain):
     # irch = nlay - active_layers
     active = idomain == 1
     irch = np.argmax(active, axis=0)          # first active layer
-    irch[~np.any(active, axis=0)] = -1       # mark fully inactive columns
+    irch[~np.any(active, axis=0)] = 0        # fully inactive columns: any valid layer (no active cell to receive recharge anyway)
     return irch
 
 def compute_recharge(irch, R):
@@ -540,9 +540,6 @@ def compute_recharge(irch, R):
         raise ValueError("irch must be a 2D array (nrow, ncol).")
     R = np.asarray(R)
     nlay = np.max(irch) + 1
-    #if R.shape[0] != nlay:
-    #    raise ValueError("R must have length equal to the number of layers in irch (max(irch)+1).") 
-    # Deactivate: This limits the generation of certain geometries where some layers might appear completely confined
     if np.any((irch < 0) | (irch >= nlay)):
         raise ValueError("All values in irch must be valid layer indices (0 to nlay-1).")
 

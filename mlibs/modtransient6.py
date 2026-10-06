@@ -1598,7 +1598,7 @@ def plot_transient_heads(
         try:
             ncol = gwf.modelgrid.ncol
             dcol = gwf.modelgrid.delr if np.isscalar(gwf.modelgrid.delr) else np.mean(gwf.modelgrid.delr)
-            x = np.arange(ncol) * dcol
+            x = (np.arange(ncol) + 0.5) * dcol
 
             # Plot each interface
             for k in range(interfaces.shape[0]):
@@ -1790,7 +1790,7 @@ def plot_transient_heads_tr(
         try:
             ncol = gwf.modelgrid.ncol
             dcol = gwf.modelgrid.delr if np.isscalar(gwf.modelgrid.delr) else np.mean(gwf.modelgrid.delr)
-            x = np.arange(ncol) * dcol
+            x = (np.arange(ncol) + 0.5) * dcol
 
             # Plot each interface
             for k in range(interfaces.shape[0]):
@@ -1951,7 +1951,7 @@ def plot_transient_heads_capture(
         try:
             ncol = gwf.modelgrid.ncol
             dcol = gwf.modelgrid.delr if np.isscalar(gwf.modelgrid.delr) else np.mean(gwf.modelgrid.delr)
-            x = np.arange(ncol) * dcol
+            x = (np.arange(ncol) + 0.5) * dcol
 
             # Plot each interface
             for k in range(interfaces.shape[0]):
@@ -2116,7 +2116,7 @@ def plot_residual_diffusion(
         try:
             ncol = gwf.modelgrid.ncol
             dcol = gwf.modelgrid.delr if np.isscalar(gwf.modelgrid.delr) else np.mean(gwf.modelgrid.delr)
-            x = np.arange(ncol) * dcol
+            x = (np.arange(ncol) + 0.5) * dcol
 
             # Plot each interface
             for k in range(interfaces.shape[0]):
@@ -2256,7 +2256,7 @@ def plot_residual_diffusion_tr(
         try:
             ncol = gwf.modelgrid.ncol
             dcol = gwf.modelgrid.delr if np.isscalar(gwf.modelgrid.delr) else np.mean(gwf.modelgrid.delr)
-            x = np.arange(ncol) * dcol
+            x = (np.arange(ncol) + 0.5) * dcol
 
             # Plot each interface
             for k in range(interfaces.shape[0]):
@@ -3728,7 +3728,7 @@ def response_time_array_absolute(
         try:
             ncol = gwf.modelgrid.ncol
             dcol = gwf.modelgrid.delr if np.isscalar(gwf.modelgrid.delr) else np.mean(gwf.modelgrid.delr)
-            x = np.arange(ncol) * dcol
+            x = (np.arange(ncol) + 0.5) * dcol
 
             # Plot each interface
             for k in range(interfaces.shape[0]):
@@ -4004,7 +4004,7 @@ def response_time_array_relative(
         try:
             ncol = gwf.modelgrid.ncol
             dcol = gwf.modelgrid.delr if np.isscalar(gwf.modelgrid.delr) else np.mean(gwf.modelgrid.delr)
-            x = np.arange(ncol) * dcol
+            x = (np.arange(ncol) + 0.5) * dcol
 
             # Plot each interface
             for k in range(interfaces.shape[0]):
