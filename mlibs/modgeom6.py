@@ -796,4 +796,26 @@ def layer_area(glay, geom_df, idomain, inland, dcol, irch):
     outcrop = (irch[0] >= mlay) & (irch[0] <= flay)
     return (present & inland).sum() * dcol, (outcrop & inland).sum() * dcol
 
+def layer_indices(geom_df):
+    """
+    Add geological-layer and sublayer index columns to the geometry table (one row per geological
+    layer, top to bottom, with 'zone' = 1..n and 'nsub' = number of model sublayers).
+
+    Added columns (all 0-based):
+        glay: geological layer index (zone - 1)
+        mlay: first model sublayer of the geological layer
+        clay: center model sublayer
+        flay: last model sublayer
+
+    Returns a copy of geom_df with the new columns.
+    """
+    geom_df = geom_df.copy()
+    nsub = geom_df['nsub'].to_numpy(dtype=int)
+    if not (geom_df['zone'].to_numpy() == np.arange(1, len(geom_df) + 1)).all():
+        raise ValueError("geometry rows must be ordered top to bottom with zone = 1..n")
+    geom_df['glay'] = geom_df['zone'] - 1
+    geom_df['mlay'] = np.concatenate(([0], np.cumsum(nsub)[:-1]))
+    geom_df['clay'] = geom_df['mlay'] + nsub // 2
+    geom_df['flay'] = geom_df['mlay'] + nsub - 1
+    return geom_df
 
