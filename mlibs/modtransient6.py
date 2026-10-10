@@ -2843,7 +2843,6 @@ def absolute_head_diffusion_zones(transient_heads,
 
     axes[-1].set_xlabel("Time since step change (years)")
     axes[0].legend()
-    plt.tight_layout()
     
     # Save/show figure
     if save_fig:
@@ -3311,7 +3310,6 @@ def relative_head_diffusion_zones(transient_heads,
 
     axes[-1].set_xlabel("Time since step change (years)")
     axes[0].legend()
-    plt.tight_layout()
     
     # Save/show figure
     if save_fig:
@@ -3523,8 +3521,6 @@ def relative_head_diffusion(transient_heads,
     ax.set_xlim(0, xlim_right)
     ax.legend()
     ax.set_autoscale_on(False) 
-    plt.tight_layout()
-
 
 	# Save figure			 
     if save_fig:

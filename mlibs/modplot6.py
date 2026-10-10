@@ -103,7 +103,7 @@ def plot_map_view(gwf,
         "RIV": "blue",
         "WEL": "red",
         "GHB": "black",
-        "DRN": "gray",
+        "DRN": "lightblue",
         "CHD": "purple"
     }
 
@@ -267,7 +267,7 @@ def plot_map_view_array(gwf,
         "RIV": "blue",
         "WEL": "red",
         "GHB": "black",
-        "DRN": "gray",
+        "DRN": "lightblue",
         "CHD": "purple"
     }
 
@@ -429,7 +429,7 @@ def plot_cross_section_row(gwf,
         "RIV": "blue",
         "WEL": "red",
         "GHB": "black",
-        "DRN": "gray",
+        "DRN": "lightblue",
         "CHD": "purple"
     }
 
@@ -647,7 +647,7 @@ def plot_cross_section_col(gwf,
         "RIV": "blue",
         "WEL": "red",
         "GHB": "black",
-        "DRN": "gray",
+        "DRN": "lightblue",
         "CHD": "purple"
     }
 
@@ -854,7 +854,7 @@ def plot_cross_section_array(gwf,
         "RIV": "blue",
         "WEL": "red",
         "GHB": "black",
-        "DRN": "gray",
+        "DRN": "lightblue",
         "CHD": "purple"}
 
     # Validate row index
